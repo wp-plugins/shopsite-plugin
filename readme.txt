@@ -16,9 +16,14 @@ There will be new button when adding a new post to the blog, with ShopSite's "SS
 
 == Installation ==
 
-1. Upload shopsite.php, search_products.js, oauth.php, editor_plugin.js, ss-20.png, populate_products.js to the '/wp-content/plugins/shopsite/' directory
-1. Activate the plugin through the 'Plugins' menu in WordPress.
-1. Configure the plugin through the 'Settings'->'ShopSite' menu in Wordpress.
+1. Go to the 'Plugins' menu in your WordPress admin console
+1. Click 'Add New'
+1. Search for 'shopsite'
+1. Click 'Install Now' under 'ShopSite' plugin
+1. Click 'Activate plugin'
+1. Go to 'ShopSite' under your 'Settings' menu in WordPress admin console
+1. Copy and paste 5 fields from Merchandising->Social Media->Wordpress in your ShopSite backoffice to your WordPress ShopSite plugin config
+
 
 == Changelog ==
 
