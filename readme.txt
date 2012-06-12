@@ -28,6 +28,8 @@ The plugin requires ShopSite v11 SP2 or greater.
 
 
 == Changelog ==
+= 1.1 =
+* Fixed a bug preventing product display in the blog for some PHP config settings
 
 = 1.0 =
 * Initial release

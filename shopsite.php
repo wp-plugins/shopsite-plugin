@@ -1,14 +1,14 @@
 <?php
 /**
  * @package ShopSite
- * @version 1.0
+ * @version 1.1
  */
 /*
 Plugin Name: ShopSite
 Plugin URI: http://shopsite.com/
 Description: ShopSite plugin to put products into your WordPress blog
 Author: ShopSite
-Version: 1.0
+Version: 1.1
 Author URI: http://shopsite.com/
 */
 if (isset($_REQUEST['ss_action'])) {
@@ -471,7 +471,10 @@ function get_product_data($id_list) {
   //$id_list = "\"".str_replace(",","\",\"",$id_list)."\"";
   $url = $shopsite_url."&operation=get_products&".$identifier."_list=".$id_list."&signature=".$signature;
   ///debug_print($url);
+  $url_openable = ini_get('allow_url_fopen');
+  ini_set('allow_url_fopen', true);
   $handle = fopen($url,'r');
+  ini_set('allow_url_fopen', $url_openable);
 	print(stream_get_contents($handle));
 }
 
