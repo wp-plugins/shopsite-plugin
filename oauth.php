@@ -39,11 +39,12 @@ function oauth($clientid, $secretkey, $code, $authorizationurl, $request_type, $
   curl_setopt($ch, CURLOPT_POSTFIELDS, $request);
   
   curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $verify_peer);
+  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
   
   $json = curl_exec($ch);
   
   
-  if (!$json) {
+  if ($json == false) {
     return array('success'=>false, 'error'=>'Curl OAUTH call failed. Curl error: '.curl_error($ch));
   }
   
@@ -53,6 +54,8 @@ function oauth($clientid, $secretkey, $code, $authorizationurl, $request_type, $
   
   
   $json = json_decode($json, true);
+  if (!is_array($json))
+    return array('success'=>false, 'error'=>'Malformed response or bad URL');
   
   if (array_key_exists("error", $json)) {
     return array('success'=>false, 'error'=>"OAUTH request error: ".$json['error_description']);
@@ -115,7 +118,7 @@ function oauth($clientid, $secretkey, $code, $authorizationurl, $request_type, $
   }
   $db_request = trim($db_request, "&");
 
-  debug_print("db_request: $db_request");
+  //debug_print("db_request: $db_request");
   
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $endpointurl);
@@ -136,6 +139,7 @@ function oauth($clientid, $secretkey, $code, $authorizationurl, $request_type, $
   }
   
   curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $verify_peer);
+  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
   
   $downloaddata = curl_exec($ch);
   if (!$downloaddata) {
@@ -145,7 +149,7 @@ function oauth($clientid, $secretkey, $code, $authorizationurl, $request_type, $
   curl_close($ch);
   
   //debug_print($downloaddata);
-  debug_print("downloaddata: $downloaddata");
+  //debug_print("downloaddata: $downloaddata");
   
   if (($json2 = json_decode($downloaddata, true)) != NULL) {
     if (array_key_exists('error', $json2)) {
@@ -194,6 +198,7 @@ function oauth($clientid, $secretkey, $code, $authorizationurl, $request_type, $
     curl_setopt($ch, CURLOPT_POST, true);    
     curl_setopt($ch, CURLOPT_POSTFIELDS, $db_request);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $verify_peer);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
     $downloaddata = curl_exec($ch);
     
     

@@ -28,6 +28,9 @@ The plugin requires ShopSite v11 SP2 or greater.
 
 
 == Changelog ==
+= 1.2 =
+* Added a Test Connection button on the configuration screen. Added a 30-second connection timeout.
+
 = 1.1 =
 * Fixed a bug preventing product display in the blog for some PHP config settings
 

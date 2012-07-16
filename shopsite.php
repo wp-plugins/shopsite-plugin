@@ -1,14 +1,14 @@
 <?php
 /**
  * @package ShopSite
- * @version 1.1
+ * @version 1.2
  */
 /*
 Plugin Name: ShopSite
 Plugin URI: http://shopsite.com/
 Description: ShopSite plugin to put products into your WordPress blog
 Author: ShopSite
-Version: 1.1
+Version: 1.2
 Author URI: http://shopsite.com/
 */
 if (isset($_REQUEST['ss_action'])) {
@@ -33,6 +33,8 @@ if (isset($_REQUEST['ss_action'])) {
   exit(0);
 }
 
+
+
 $product_list;
 $wp_id;
 
@@ -50,6 +52,8 @@ function add_shopsite_menu() {
 
 function show_shopsite_menu() {
 	global $wpdb;
+  include_once "oauth.php";
+  $testing = false;
 
 	add_option('shopsite_url');
   add_option('clientid');
@@ -70,6 +74,11 @@ function show_shopsite_menu() {
   if (isset($_REQUEST['authorizationurl'])) update_option('authorizationurl', $_REQUEST['authorizationurl']);
   
   if (isset($_REQUEST['identifier'])) update_option('identifier', $_REQUEST['identifier']);
+  if (isset($_REQUEST['test'])) {
+    $testing = true;
+    $test_result = test_connection();
+  }
+    
 	
 	$shopsite_url = get_option('shopsite_url');
   $clientid = get_option('clientid');
@@ -85,26 +94,43 @@ function show_shopsite_menu() {
   else
     $GUID_selected = "checked";
 
+//ss_action=plugins.php?page=shopsite_menu
 	echo 	"<h1>ShopSite configuration</h1>
-		<form method=post ss_action=plugins.php?page=shopsite_menu >
+		<form method=post>
     <table>
     <tr><th colspan=2>Application settings</th></tr>
-    <tr><td>Client ID:</td><td><input type=text name=clientid value='$clientid' size=100></td></tr>
-    <tr><td>Secret Key for Signing:</td><td><input type=text name=secretkey value='$secretkey' size=100></td></tr>
-    <tr><td>Authorization Code:</td><td><input type=text name=code value='$code' size=100></td></tr>
-    <tr><td>Authorization URL:</td><td><input type=text name=authorizationurl value='$authorizationurl' size=100></td></tr>
-    <tr><th colspan=2>Other settings</th></tr>
+    <tr><td>Client ID:</td><td><input type=text name=clientid id=clientid value='$clientid' size=100></td></tr>
+    <tr><td>Secret Key for Signing:</td><td><input type=text name=secretkey id=secretkey value='$secretkey' size=100></td></tr>
+    <tr><td>Authorization Code:</td><td><input type=text name=code id=code value='$code' size=100></td></tr>
+    <tr><td>Authorization URL:</td><td><input type=text name=authorizationurl id=authorizationurl value='$authorizationurl' size=100></td></tr>";
+    
+
+  
+  echo "<tr><th colspan=2>Other settings</th></tr>
     <tr><td>ShopSite callback URL:</td><td><input type=text name=shopsite_url value='$shopsite_url' size=100></td></tr>
     <tr><td>Unique product identifier:</td>
     <td>
     <input type=radio name=identifier value='GUID' $GUID_selected/>Global unique ID<br/>
     <input type=radio name=identifier value='SKU' $SKU_selected/>SKU</td></tr>
     </table>
-		<br/><input type=submit value='Save settings'></form>";
+    <br/><input type=submit name=test value='Test connection'>";
+  
+  if ($testing) {
+    echo "<br>";
+    if ($test_result['success'] == true)
+      echo "<font color=green><b>Connection test successful</b></font>";
+    if ($test_result['success'] == false) {
+      echo "<font color=red><b>Connection test failed, check your settings.<br>Error: ".$test_result["error"];
+    }
+  }
+  
+  echo "<br/><input type=submit value='Save settings'></form>";
 }
 
-
-
+/*onclick='window.open(\"".plugin_dir_url(__FILE__)."shopsite.php?ss_action=test&clientid=\"+document.forms[0].clientid.value+\"&secretkey=\"+document.forms[0].secretkey.value
+      +\"&code=\"+document.forms[0].code.value+\"&authorizationurl=\"+document.forms[0].authorizationurl.value
+      ,\"\",\"width=400,height=300\");' */
+//document.forms[0].clientid.value
 
 
 
@@ -476,6 +502,30 @@ function get_product_data($id_list) {
   $handle = fopen($url,'r');
   ini_set('allow_url_fopen', $url_openable);
 	print(stream_get_contents($handle));
+}
+
+function test_connection() {
+  $test_download_xml = oauth(
+    get_option('clientid'), get_option('secretkey'), get_option('code'), get_option('authorizationurl'), 
+    DOWNLOAD, 
+    array('clientApp'=>'1', 'dbname'=>'products', 'version'=>'11.2', 'fields'=>'|Product GUID|Name|SKU|', 'search_term'=>"B0gu5", 'search_on'=>'name', 'search_filter'=>'contains', 'limit'=>1)
+  );
+  if (!$test_download_xml["success"])
+    return $test_download_xml;
+    
+  
+    
+  $shopsite_url = get_option('shopsite_url');
+  $url_openable = ini_get('allow_url_fopen');
+  ini_set('allow_url_fopen', true);
+  $url = $shopsite_url;
+  $handle = fopen($url,'r');
+  ini_set('allow_url_fopen', $url_openable);
+  
+  if ($handle == false)
+    return array("success"=>false, "error"=>"Check your callback URL");
+  
+  return array("success"=>true); 
 }
 
 function debug_print($text) {
