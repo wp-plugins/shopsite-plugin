@@ -299,6 +299,8 @@ function get_product_list() {
     array('clientApp'=>'1', 'dbname'=>'products', 'version'=>'11.2', 'fields'=>'|Product GUID|Name|SKU|', 'search_term'=>$search_string, 'search_on'=>$search_on, 'search_filter'=>'contains', 'limit'=>1000)
   );
   
+
+  
   if (!$products_xml['success']) {
     echo $products_xml['error'];
     exit(1);
@@ -497,14 +499,20 @@ function get_product_data($id_list) {
   //$id_list = "\"".str_replace(",","\",\"",$id_list)."\"";
   $url = $shopsite_url."&operation=get_products&".$identifier."_list=".$id_list."&signature=".$signature;
   ///debug_print($url);
-  $url_openable = ini_get('allow_url_fopen');
+  /*$url_openable = ini_get('allow_url_fopen');
   ini_set('allow_url_fopen', true);
   $handle = fopen($url,'r');
   ini_set('allow_url_fopen', $url_openable);
-	print(stream_get_contents($handle));
+	print(stream_get_contents($handle));*/
+  print(curl_open($url));
 }
 
 function test_connection() {
+
+  if  (!in_array  ('curl', get_loaded_extensions())) {
+    return array("success"=>false, "error"=>"CURL PHP extension is not installed on your server. Contact your hosting provider.");
+  }
+
   $test_download_xml = oauth(
     get_option('clientid'), get_option('secretkey'), get_option('code'), get_option('authorizationurl'), 
     DOWNLOAD, 
@@ -515,7 +523,7 @@ function test_connection() {
     
   
     
-  $shopsite_url = get_option('shopsite_url');
+  /*$shopsite_url = get_option('shopsite_url');
   $url_openable = ini_get('allow_url_fopen');
   ini_set('allow_url_fopen', true);
   $url = $shopsite_url;
@@ -523,6 +531,9 @@ function test_connection() {
   ini_set('allow_url_fopen', $url_openable);
   
   if ($handle == false)
+    return array("success"=>false, "error"=>"Check your callback URL");*/
+  
+  if (curl_open(get_option('shopsite_url')) == false)
     return array("success"=>false, "error"=>"Check your callback URL");
   
   return array("success"=>true); 
@@ -530,6 +541,17 @@ function test_connection() {
 
 function debug_print($text) {
   file_put_contents("log.txt", $text."\n", FILE_APPEND);
+}
+
+function curl_open($url) {
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, $url);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+  $html = curl_exec($ch);
+  curl_close($ch);
+      
+  return $html;
 }
 
 ?>
