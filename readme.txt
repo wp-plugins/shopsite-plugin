@@ -18,16 +18,17 @@ There will be new button when adding a new post to the blog, with ShopSite's "SS
 
 The plugin requires ShopSite v11 SP2 or greater.
 
-1. Go to the 'Plugins' menu in your WordPress admin console
-1. Click 'Add New'
-1. Search for 'shopsite'
-1. Click 'Install Now' under 'ShopSite' plugin
-1. Click 'Activate plugin'
-1. Go to 'ShopSite' under your 'Settings' menu in WordPress admin console
-1. Copy and paste 5 fields from Merchandising->Social Media->Wordpress in your ShopSite backoffice to your WordPress ShopSite plugin config
+1. Select 'Plugins' in your WordPress admin console
+1. Select 'Add New'
+1. Search for 'shopsite' in Plugins search box
+1. Select 'Install Now' under 'ShopSite' plugin
+1. Select 'Activate plugin'
 
 
 == Changelog ==
+= 1.4 =
+* Changed the configuration procedure to only make user copy/paste 1 string instead of 5. Added installation tutorial.
+
 = 1.3 =
 * Changed shopper-facing product download method to allow product display in the blog for some PHP config settings.
 

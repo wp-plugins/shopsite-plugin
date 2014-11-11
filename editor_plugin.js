@@ -5,13 +5,17 @@
 			var disabled = true;
 
 			ed.addCommand('open_shopsite', function() {
+        tutorial = "";
+        if (window.location.href.search("tutorial=1") != -1)
+          tutorial = "&tutorial=1";
 				ed.windowManager.open({
           url: path + 
-            "/shopsite.php?ss_action=insert",
+            "/shopsite.php?ss_action=insert" + tutorial,
 					width : 600,
 					height : 400,
 					title : "Loading... please wait.",
           inline: true
+          , onClose: function() { if (tutorial != "") continue_tutorial();}
 				}, {
 					plugin_url : url // Plugin absolute URL
 				});
@@ -21,6 +25,7 @@
 			ed.addButton('shopsite', {
 				title : 'Insert a ShopSite product',
 				cmd : 'open_shopsite',
+        id: 'shopsite_button',
         image : url+'/ss-20.png'
 			});
 

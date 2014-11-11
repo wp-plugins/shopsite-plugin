@@ -1,5 +1,9 @@
 window.onload = populate_products;
 
+function rfc3986EncodeURIComponent (str) {  
+    return encodeURIComponent(str).replace(/[!'()*]/g, escape);  
+}
+
 function populate_products() {
   //alert(id_list);
   //alert(path + "shopsite.php");
@@ -16,9 +20,10 @@ function populate_products() {
         for (i in products) {
           if (products[i].length > 0) {
             var pair = products[i].split("\6");
-            //alert(pair[0] + " " +pair[1]);
-            for (j in product_map[pair[0]]) {
-              $('#product_' + product_map[pair[0]][j]).html(pair[1]);
+            var id = rfc3986EncodeURIComponent(pair[0]);
+            //alert(id);
+            for (j in product_map[id]) {
+              $('#product_' + product_map[id][j]).html(pair[1]);
             }
           }
         }

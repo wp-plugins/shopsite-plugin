@@ -1,0 +1,70 @@
+h1 {
+  margin-bottom: 10px;
+}
+
+a#get_shopsite {
+  display: inline-block;
+}
+
+div#masking_overlay {
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:10000;
+  opacity: 0.5; 
+  background-color: black;
+}
+
+div#tutorial {
+  z-index: 10002;
+  position: absolute;
+  background-color: white;
+  padding: 10px;
+  text-align: center;
+  border-radius: 4px;
+}
+
+div#tutorial_close {
+  background-image: url(ui-icons_222222_256x240.png);
+  background-position: -80px -128px;
+  opacity: 0.2;
+  height: 16px;
+  width: 16px;
+  position: absolute;
+  top:0px;
+  right:0px;
+  cursor: pointer;
+}
+
+tbody#ss_11_settings {
+  display: none;
+}
+
+a#ss_11, a#ss_12, a#proceed_tutorial {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+a#ss_11, a#ss_12 {
+  display: block;
+}
+
+a#ss_11 {
+  width: 300px;
+}
+
+#test_result {
+  width: 400px;
+}
+
+#test_good {
+  font-weight: bold;
+  color:green;
+}
+
+#test_bad {
+  font-weight: bold;
+  color:red;
+}

@@ -114,7 +114,7 @@ function oauth($clientid, $secretkey, $code, $authorizationurl, $request_type, $
   
   $db_request = "";
   foreach ($data as $k=>$v) {
-    $db_request .= "$k=$v&";
+    $db_request .= "$k=".rawurlencode($v)."&";
   }
   $db_request = trim($db_request, "&");
 

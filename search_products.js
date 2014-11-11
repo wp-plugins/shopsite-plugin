@@ -5,7 +5,7 @@ $ = jQuery;
 function do_stuff() {
   $('#search_button').click(function() {
     $('#search_results').html("<div id=please_wait>Searching... please wait</div>");
-    var data = "ss_action=search_products&search_string=" + $('#search_string').val() + "&search_on=" + $('#search_on').val() + "&remember_search=" + $('#remember_search').is(':checked');
+    var data = "ss_action=search_products&search_string=" + encodeURIComponent($('#search_string').val()) + "&search_on=" + $('#search_on').val() + "&remember_search=" + $('#remember_search').is(':checked');
     //alert(data);
     $.ajax({
       async: true,
