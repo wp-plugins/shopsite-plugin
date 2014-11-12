@@ -2,7 +2,7 @@
 Contributors: ShopSite
 Tags: e-commerce, shopping, shopsite
 Requires at least: 3.2.0
-Tested up to: 3.5.1
+Tested up to: 4.0
 Stable tag: trunk
 
 Official ShopSite plugin. Allows merchants to insert ShopSite products into their blog.
