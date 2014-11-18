@@ -5,14 +5,13 @@ Requires at least: 3.2.0
 Tested up to: 4.0
 Stable tag: trunk
 
-Official ShopSite plugin. Allows merchants to insert ShopSite products into their blog.
+Add a free ShopSite shopping cart to your WordPress site and start taking orders today!
 
 == Description ==
 
-The plugin integrates ShopSite (http://www.shopsite.com) shopping cart functionality with WordPress blogs. Requires ShopSite v11 SP2 or greater. After installing the plugin a merchant will be able to select ShopSite products directly from WordPress admin console and add them to her blog. The visitors of that blog will be able to add products to cart right on the blog, after which they are redirected to the merchant's ShopSite store to check out.
+The plugin integrates ShopSite shopping cart functionality with WordPress blogs. If you don't have a ShopSite cart you can get a free Express store (http://saas.shopsite.com/express).  After installing the plugin a merchant will be able to select ShopSite products directly from WordPress admin console and add them to her blog. The visitors of that blog will be able to add products to cart right on the blog, after which they are redirected to the merchant's ShopSite store to check out. Requires ShopSite v11 SP2 or greater.
 
-Usage:
-There will be new button when adding a new post to the blog, with ShopSite's "SS" on it. Clicking it will bring out a product search form where you can select products from your ShopSite's store database to insert into the post.
+Usage: There will be new button when adding a new post to the blog, with ShopSite's "SS" on it. Clicking it will bring out a product search form where you can select products from your ShopSite's store database to insert into the post.
 
 == Installation ==
 
