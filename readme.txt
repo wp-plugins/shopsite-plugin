@@ -25,6 +25,9 @@ The plugin requires ShopSite v11 SP2 or greater.
 
 
 == Changelog ==
+= 1.4.1 =
+* Changed the shortcode to [ss_product] and javascript variable name to ss_path to avoid conflicts with other plugins.
+
 = 1.4 =
 * Changed the configuration procedure to only make user copy/paste 1 string instead of 5. Added installation tutorial.
 

@@ -9,7 +9,7 @@ function start_tutorial() {
 }
 
 function continue_tutorial() {
-  $('#content_ifr').tutorial({'instruction':'You\'ll see something like [product...] in your blog and when you preview or publish that tag will show your Order Button <br> <a href=# class=\'remove_me\'>Finish tutorial</a>',
+  $('#content_ifr').tutorial({'instruction':'You\'ll see something like [ss_product...] in your blog and when you preview or publish that tag will show your Order Button <br> <a href=# class=\'remove_me\'>Finish tutorial</a>',
   'instructionCss':{'width':400},'placement':'above', 'removeOnClose':false});
   $('.remove_me').one('click', function () {
     $.tutorial.remove();

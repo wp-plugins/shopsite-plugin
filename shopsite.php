@@ -1,14 +1,14 @@
 <?php
 /**
  * @package ShopSite
- * @version 1.4
+ * @version 1.4.1
  */
 /*
 Plugin Name: ShopSite
 Plugin URI: http://shopsite.com/
 Description: ShopSite plugin to put products into your WordPress blog
 Author: ShopSite
-Version: 1.4
+Version: 1.4.1
 Author URI: http://shopsite.com/
 */
 if (isset($_REQUEST['ss_action'])) {
@@ -82,6 +82,7 @@ add_action( 'wp_footer', 'dispatch_product_list' );
 add_action('admin_menu', 'add_shopsite_menu');
 add_action('init', 'shopsite_addbuttons');
 add_shortcode( 'product', 'product_handler' );
+add_shortcode( 'ss_product', 'product_handler' );
 
 function add_shopsite_menu() {
 	add_submenu_page( "options-general.php", "ShopSite", "ShopSite", "manage_options", "shopsite_menu", "show_shopsite_menu" );
@@ -283,7 +284,7 @@ function add_shopsite_tinymce_plugin($plugin_array) {
 */
   echo 
   "<script>
-  var path='".plugin_dir_url(__FILE__)."'; 
+  var ss_path='".plugin_dir_url(__FILE__)."'; 
   </script>";
   
   $path = plugin_dir_url(__FILE__).'editor_plugin.js';
@@ -418,6 +419,8 @@ function get_product_list() {
     array_merge(array('clientApp'=>'1', 'dbname'=>'products', 'version'=>'11.2', 'fields'=>'|Product GUID|Name|SKU|', 'limit'=>1000), $search_array)
   );
   
+  //debug_print(print_r($products_xml,1));
+  
 
   
   if (!$products_xml['success']) {
@@ -511,7 +514,7 @@ function get_product_list() {
         var sku_string = '';
         if (sku.length > 0)
           sku_string = 'sku=\''+sku+'\'';
-        var shortcode = '<p>[product '+p_id_string+' '+sku_string+']'+p_name+'[/product]</p>';
+        var shortcode = '<p>[ss_product '+p_id_string+' '+sku_string+']'+p_name+'[/ss_product]</p>';
         
         tinyMCEPopup.execCommand('mceInsertContent', false, shortcode); 
       }
@@ -606,7 +609,7 @@ function dispatch_product_list() {
   
   
   echo 
-    "<script> var path='".plugin_dir_url(__FILE__)."'; 
+    "<script> var ss_path='".plugin_dir_url(__FILE__)."'; 
     var identifier = \"$identifier\"; 
     var product_map = $product_map; 
     var id_list = \"$id_list\"; 

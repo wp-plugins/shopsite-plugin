@@ -9,7 +9,7 @@
         if (window.location.href.search("tutorial=1") != -1)
           tutorial = "&tutorial=1";
 				ed.windowManager.open({
-          url: path + 
+          url: ss_path + 
             "/shopsite.php?ss_action=insert" + tutorial,
 					width : 600,
 					height : 400,

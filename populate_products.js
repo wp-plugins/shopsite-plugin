@@ -12,7 +12,7 @@ function populate_products() {
     async: true,
     type: 'POST',
     data: {ss_action:'get_data', shopsite_url:shopsite_url, id_list: id_list, identifier: identifier},
-    url: path + "shopsite.php",
+    url: ss_path + "shopsite.php",
     success: function(data) {
       //alert(data);
       if (data.length > 1) {
