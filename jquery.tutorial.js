@@ -1,3 +1,4 @@
+//search for $.tutorial.defaults to see acceptable options
 (function( $ ) {
   
 
@@ -130,7 +131,7 @@
     return this;
   };
   
-  
+  //overwritable options
   $.tutorial.defaults = {
       instruction: false,
       placement: 'below',

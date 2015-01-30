@@ -25,6 +25,9 @@ The plugin requires ShopSite v11 SP2 or greater.
 
 
 == Changelog ==
+= 1.5.0 =
+* Changed UI for selecting a product.
+
 = 1.4.1 =
 * Changed the shortcode to [ss_product] and javascript variable name to ss_path to avoid conflicts with other plugins.
 

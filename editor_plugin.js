@@ -11,8 +11,8 @@
 				ed.windowManager.open({
           url: ss_path + 
             "/shopsite.php?ss_action=insert" + tutorial,
-					width : 600,
-					height : 400,
+					width : 830,
+					height : 600,
 					title : "Loading... please wait.",
           inline: true
           , onClose: function() { if (tutorial != "") continue_tutorial();}

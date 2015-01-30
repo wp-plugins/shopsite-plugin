@@ -1,14 +1,14 @@
 <?php
 /**
  * @package ShopSite
- * @version 1.4.1
+ * @version 1.5.0
  */
 /*
 Plugin Name: ShopSite
 Plugin URI: http://shopsite.com/
 Description: ShopSite plugin to put products into your WordPress blog
 Author: ShopSite
-Version: 1.4.1
+Version: 1.5.0
 Author URI: http://shopsite.com/
 */
 if (isset($_REQUEST['ss_action'])) {
@@ -47,12 +47,25 @@ function on_activate() {
 function load_plugin() {
     if ( is_admin() && get_option( 'Activated_Plugin' ) == 'Plugin-Slug' ) {
         delete_option( 'Activated_Plugin' );
-        add_action( 'admin_head', 'start_tutorial');
+        
+        $shopsite_url = get_option('shopsite_url');
+        if ($shopsite_url == false || strlen($shopsite_url) < 10) {
+          add_action( 'admin_head', 'start_tutorial');
+        }
+        /*else {
+          $media_url = get_option('media_url');
+          if ($media_url == false || strlen($media_url) < 10)
+            add_action( 'admin_head', 'request_output_url');
+        }*/
     }
 }
 
 function start_tutorial() {
   echo "<script>start_tutorial();</script>";  
+}
+
+function request_output_url() {
+  echo "<script>request_output_url();</script>";  
 }
 
 /*function link_jquery() {
@@ -107,7 +120,7 @@ function show_shopsite_menu() {
   
   add_option('remember_search');
   add_option('remembered_search_string');
-  add_option('remembered_search_on');
+  
   
   if (isset($_REQUEST['config_type'])) {
   
@@ -209,10 +222,15 @@ function show_shopsite_menu() {
     <tr><td>Secret Key for Signing:</td><td><input type=text name=secretkey id=secretkey value='$secretkey' size=100></td></tr>
     <tr><td>Authorization Code:</td><td><input type=text name=code id=code value='$code' size=100></td></tr>
     <tr><td>Authorization URL:</td><td><input type=text name=authorizationurl id=authorizationurl value='$authorizationurl' size=100></td></tr>
-    <tr><td>ShopSite callback URL:</td><td><input type=text name=shopsite_url value='$shopsite_url' size=100></td></tr>
-    </tbody>
-    ";
+    <tr><td>ShopSite callback URL:</td><td><input type=text name=shopsite_url value='$shopsite_url' size=100></td></tr>";
     
+  /*echo
+    "<tr id=store_url_instructions><td colspan=2>You can find Store URL under 'Preferences'->'Hosting Service'</td></tr>
+    <tr><td>Store URL:</td><td><input type=text name=store_url value='$store_url' size=100></td></tr>";*/
+    
+  echo
+    "</tbody>";
+    //http://eval.shopsite.com/cgi-bin/ilya/ss/preview.cgi?&storeid=*0c5125a8823496a6&image_preview=1&page=2
 
   
   /*echo "<tr><th colspan=2>Other settings</th></tr>*/
@@ -299,10 +317,10 @@ function add_shopsite_tinymce_plugin($plugin_array) {
 
 function show_search_form() {
 
-  $tinymce_url = includes_url()."/js/tinymce/tiny_mce_popup.js";
-  $jquery_url = includes_url()."/js/jquery/jquery.js";
+  $tinymce_url = includes_url()."js/tinymce/tiny_mce_popup.js";
+  $jquery_url = includes_url()."js/jquery/jquery.js";
   
-  $search_string = $default_search_string = "I am looking for...";
+  $search_string = "*";
   
   $remember_search = "";
   $selected_name = "";
@@ -312,68 +330,30 @@ function show_search_form() {
       
     if (strlen(get_option('remembered_search_string')))
       $search_string = get_option('remembered_search_string');
-      
-    if (strlen(get_option('remembered_search_on'))) {
-      $search_on = get_option('remembered_search_on');
-      if ($search_on == 'name')
-        $selected_name = "selected";
-      if ($search_on == 'sku')
-        $selected_sku = "selected";
-    }
+    
   }
   
   echo "
   <html>
   <head>
-  <script type='text/javascript' src='".$jquery_url."'></script>";
+  <script type='text/javascript' src='".$jquery_url."'></script>\n";
   link_tutorial();
-  echo"<script type='text/javascript' src='".$tinymce_url."'></script>
+  echo"<script type='text/javascript' src='".$tinymce_url."'></script>\n
   <script type='text/javascript' src='".plugin_dir_url(__FILE__)."search_products.js?".time()."'></script>
-  <script type='text/javascript'> var default_search_string = '".$default_search_string."';</script>
-  <style type='text/css'>
-  #search_string {
-    width: 100%;
-  }
-  #search_form, #search_results {
-    float: left;
-  }
-  #search_results {
-    padding-left: 20px;
-  }
-  #please_wait, #no_products {
-    margin-top: 50px;
-    
-  }
-  </style>
+  <script type='text/javascript'> var remembered_search_string = '".$search_string."';</script>
+  
+  
   </head>
   <body>";
   
-  echo "
-  <table id=search_form>
-  <tr>
-  <td>Search products by:</td>
-  <td><select id=search_on name=search_on>
-  <option value=name $selected_name>Name</option>
-  <option value=sku $selected_sku>SKU</option>
-  </select></td>
-  </tr>
-  
-  <tr>
-  <td colspan=2><input id=search_string name=search_string type=text value ='$search_string'></td>
-  </tr>
-  
-  <tr>
-  <td>Remember search</td>
-  <td><input type=checkbox $remember_search name=remember_search id=remember_search></td>
-  </tr>
-  
-  <tr>
-  <td colspan=2><input type=button value='Search' id=search_button></td>
-  </tr>
-  
-  </table>";
-  
+  echo "<div id=top_bar>";
+  echo "<div id=message>You can use CTRL and SHIFT keys to select multiple products.</div>";  
+  echo "<div id=tabs>";
+  echo "<div class='tab selected_tab' id=list_all>List all products</div><div class=tab id=search>Search</div>";
+  echo "</div>";
+  echo "</div>";
   echo "<div id=search_results></div>";
+  echo "<div id=\"bottom_fix\"><div id=\"insert_button\">Insert into post</div></div>";
   
   echo "
   </body>
@@ -384,9 +364,10 @@ function show_search_form() {
 
 function get_product_list() {
   include_once "oauth.php";
+  $limit = 1000;
   //echo ("in:|".$_REQUEST['search_string']."|<br>");
   $search_string = stripslashes(trim($_REQUEST['search_string']));
-  $search_on = $_REQUEST['search_on'];
+  
   
   $remember_search = $_REQUEST['remember_search'];
   
@@ -395,149 +376,133 @@ function get_product_list() {
   
   if ($remember_search == 'true') {
     update_option('remembered_search_string', $search_string);
-    update_option('remembered_search_on', $search_on);
   }
 
   
-  //if ($url == "")
-    $shopsite_url = get_option('shopsite_url');
-  /*else
-    $shopsite_url = $url;*/
-  //echo $shopsite_url;
-	
-  //$handle = fopen($shopsite_url."&operation=get_product_list",'rb');
-	//$contents = stream_get_contents($handle);
-  $search_array = array('search_on'=>$search_on, 'search_term'=>$search_string, 'search_filter'=>'contains');
-  if ($search_string == '*')
-    $search_array = array();
-    
-  //echo("ss:|$search_string|");
+  $shopsite_url = get_option('shopsite_url');
+
   
+  $media_url = false;//get_option('media_url');
+  if (!$media_url) {
+    $shopsite_url = get_option('shopsite_url');
+    $url = $shopsite_url."&operation=get_setting&setting=output_url";  
+    $outputurl = curl_open($url);
+    if (strlen($outputurl) > 10) {
+      $media_url = $outputurl."/media/";
+      add_option('media_url');
+      update_option('media_url', $media_url);
+    }
+  }
+  
+  
+  
+  $list_all = false;
+  if ($search_string == '*') {
+    $search_array = array();
+    $list_all = true;
+  }
+   
+  
+  if (!$list_all) {
+    if ($media_url)
+      $search_array = array('search_on'=>"name,sku", 'search_term'=>$search_string, 'search_filter'=>'contains');
+    else
+      $search_array = array('search_on'=>"name", 'search_term'=>$search_string, 'search_filter'=>'contains');
+  }
+    
   $products_xml = oauth(
     get_option('clientid'), get_option('secretkey'), get_option('code'), get_option('authorizationurl'), 
     DOWNLOAD, 
-    array_merge(array('clientApp'=>'1', 'dbname'=>'products', 'version'=>'11.2', 'fields'=>'|Product GUID|Name|SKU|', 'limit'=>1000), $search_array)
+    array_merge(array('clientApp'=>'1', 'dbname'=>'products', 'version'=>'11.2', 'fields'=>'|Product GUID|Name|SKU|Graphic|', 'limit'=>$limit), $search_array)
   );
   
-  //debug_print(print_r($products_xml,1));
-  
-
+  //debug_print(print_r($products_xml,true));
   
   if (!$products_xml['success']) {
-    echo $products_xml['error'];
+    echo "<div id=error_head>Unfortunately, something went wrong.</div>";
+    echo "<div id=error_message>Detailed error message: <br>".$products_xml['error']."</div>";
     exit(1);
   }
-  
-  //debug_print($products_xml['data']);
-  
-  /*echo $products_xml['data'];
-  exit(0);
-  
-	$product_ar = explode("\6", $contents);*/
-  
-  $tinymce_url = includes_url()."/js/tinymce/tiny_mce_popup.js";
-  $jquery_url = includes_url()."/js/jquery/jquery.js";
-
-  /*echo "<html>";
-  echo "<head>";
-  echo "<script language=\"javascript\" type=\"text/javascript\" src=\"$tinymce_url\"></script>";
-  //echo "<script language=\"javascript\" type=\"text/javascript\" src=\"$jquery_url\"></script>";
-  echo "</head>";
-    
-  
-  echo "<body>";*/
-  
-  
-  
-  $products = new SimpleXMLElement($products_xml['data']);
   $products_ar = array();
   
-  
-  
-    
-  if (count($products->Products->Product) > 0) 
-  {  
-  
+  $products = new SimpleXMLElement($products_xml['data']);
+  if (count($products->Products->Product) > 0) {
     foreach ($products->Products->Product as $product) {
-      $products_ar[addslashes($product->Name)] = array($product->ProductGUID, $product->SKU);
+      $products_ar[addslashes($product->Name)] = array($product->ProductGUID, $product->SKU, $product->Graphic);
     }
-  
-    ksort($products_ar);
-    
-    
-    //debug_print("products_ar: ".print_r($products_ar, true));
-    
-    echo "Select a product:";
-    echo "<form>";
-    echo "<select id=product name=product size=20>";
-    
-    foreach ($products_ar as $Name => $ids) {
-      $Name = stripslashes($Name);
-      $GUID = $ids[0];
-      $SKU = rawurlencode($ids[1]);
-      echo "<option value=\"";
-      if (strlen($GUID) > 0)
-        echo $GUID;
-      echo "|";
-      if (strlen($SKU) > 0)
-        echo $SKU;
-      echo "\">$Name";
-      echo "</option>\n";
-    }
-    
-    echo "</select>";
-    echo "</form>";
-    echo "<br/>";
-    
-    /*echo "
-      <script language=\"javascript\" type=\"text/javascript\">
-      $('#product').select(function() {
-        var id = $('#product option:selected').val();
-        tinyMCEPopup.execCommand('mceInsertContent', false, '[product id=$id]'); 
-        tinyMCEPopup.close();
-      });
-      </script>
-    ";*/
-    
-    echo "
-      <script language=\"javascript\" type=\"text/javascript\">
-      function insert_product() {
-        var p_id_sku = document.forms[0].product.value;
-        var pair = p_id_sku.split('|');
-        var p_id = pair[0];
-        var sku = pair[1];
-        var p_index = document.forms[0].product.selectedIndex;
-        var p_name = document.forms[0].product[p_index].innerHTML;
-        var p_id_string = '';
-        if (p_id.length > 0)
-          p_id_string = 'id='+p_id;
-        var sku_string = '';
-        if (sku.length > 0)
-          sku_string = 'sku=\''+sku+'\'';
-        var shortcode = '<p>[ss_product '+p_id_string+' '+sku_string+']'+p_name+'[/ss_product]</p>';
-        
-        tinyMCEPopup.execCommand('mceInsertContent', false, shortcode); 
-      }
-      </script>
-    ";
-    
-    echo "<a id=\"insert_product\" href=# onclick=\"insert_product();\">Insert product</a>";
-    echo "<br/><a id=\"close_popup\" href=# onclick=\"tinyMCEPopup.close();\">Close this popup</a>";
-    
-
-  } else {
-    echo "<div id=no_products>No matching products.</div>";
   }
   
+  //if media_url is absent, that means shopsite's XML API can't handle searches on multiple fields at once. We'll perform two separate searches then.
+  if (!$list_all && !$media_url) {
+    $search_array = array('search_on'=>"sku", 'search_term'=>$search_string, 'search_filter'=>'contains');
+    $products_xml = oauth(
+      get_option('clientid'), get_option('secretkey'), get_option('code'), get_option('authorizationurl'), 
+      DOWNLOAD, 
+      array_merge(array('clientApp'=>'1', 'dbname'=>'products', 'version'=>'11.2', 'fields'=>'|Product GUID|Name|SKU|Graphic|', 'limit'=>$limit), $search_array)
+    );
+    $products = new SimpleXMLElement($products_xml['data']);
+    if (count($products->Products->Product) > 0) { 
+      foreach ($products->Products->Product as $product) {
+        if (!array_key_exists(addslashes($product->Name), $products_ar))
+          $products_ar[addslashes($product->Name)] = array($product->ProductGUID, $product->SKU, $product->Graphic);
+      }
+    }
+  }
   
+  if (count($products_ar) == 0) {
+    echo "<div id=no_products>No matching products.</div>";
+    return;
+  }
   
+
+  ksort($products_ar);
+  $products_ar = array_slice($products_ar,0,$limit);
   
-  //echo "</form>";
-  /*
-  echo "</body>";
+  echo "<div id=\"products\">";
+  if (count($products_ar) == $limit) {
+    echo "<div id=\"over_limit_warning\">Displaying first $limit products only. Please use \"Search\" button to narrow down your results.</div>";
+  }
+  $count = 1;
+  foreach ($products_ar as $name => $data) {
+    print_product($count, stripslashes($name), $data, $media_url);
+    $count++;
+  }
+  echo "</div>";
+
+}
+
+function print_product ($count, $name, $data, $media_url) {
+  $id = $data[0];
+  $sku = rawurlencode($data[1]);
+  $image = $data[2];
   
-  echo"</html>";*/
+  if (!strstr($image, "://")) {
+    if ($image && strstr($image,".") && $image != "no-image.png") {
+      $image_ar = explode("/", $image,2);
+      if (count($image_ar) == 2)
+        $image = $image_ar[0]."/ss_size2/".$image_ar[1];
+      else
+        $image = "ss_size2/".$image_ar[0];
+    } else
+      $image = "ss_size2/no-image.png";
+  }
   
+  echo "<div class=\"wp_product\" id=\"wp_product_$count\">";
+  if ($media_url)
+    if (strstr($image, "://"))
+      echo "<img class=\"product_image\" src=\"".$image."\">";
+    else
+      echo "<img class=\"product_image\" src=\"".$media_url.$image."\">";
+  else 
+    echo "<div class=\"outdated_shopsite\">Update ShopSite to see product images</div>";
+  if (strlen($sku) > 0)
+    echo "<div class='product_sku'>".strip_tags($sku)."</div>";
+  echo "<a class=\"product_name\" title=\"".str_replace("\"","&quot;",$name)."\">".strip_tags($name)."</a>";
+  
+  echo '<input type=hidden class="name_input" name="name_input" value="'.str_replace("\"","&quot;",$name).'">';
+  echo '<input type=hidden class="guid_input" name="guid_input" value="'.$id.'">';
+  echo '<input type=hidden class="sku_input" name="sku_input" value="'.str_replace("\"","&quot;",$sku).'">';
+  echo "</div>";
 }
 
 
@@ -617,10 +582,10 @@ function dispatch_product_list() {
   //echo "<script> var product_mapping = ".json_encode($product_list).";</script>";
 }
 
+
 function get_product_data($id_list) {
   $id_list = stripslashes($id_list);
   //debug_print("GPD |$id_list|");
-  
   $clientid = get_option('clientid');
   $secretkey = get_option('secretkey');
   $ids = explode(",", $id_list);

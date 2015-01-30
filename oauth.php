@@ -66,6 +66,7 @@ function oauth($clientid, $secretkey, $code, $authorizationurl, $request_type, $
   switch ($request_type) {
     case DOWNLOAD:
       $endpointurl = $json['download_url'];
+      
       break;
     case UPLOAD:
       $endpointurl = $json['upload1_url'];
@@ -74,6 +75,7 @@ function oauth($clientid, $secretkey, $code, $authorizationurl, $request_type, $
       $endpointurl = $json['publish_url'];
       break;
   }
+  //debug_print("endpoint: ".$endpointurl);
   
   $url_stuff = parse_url($endpointurl);
   $endpoint = $url_stuff['path'];
