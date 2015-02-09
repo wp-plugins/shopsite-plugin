@@ -2,7 +2,7 @@
 Contributors: ShopSite
 Tags: e-commerce, shopping, shopsite
 Requires at least: 3.2.0
-Tested up to: 4.0
+Tested up to: 4.1
 Stable tag: trunk
 
 Add a free ShopSite shopping cart to your WordPress site and start taking orders today!

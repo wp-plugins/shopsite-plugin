@@ -23,7 +23,8 @@ function populate_products() {
             var id = rfc3986EncodeURIComponent(pair[0]);
             //alert(id);
             for (j in product_map[id]) {
-              $('#product_' + product_map[id][j]).html(pair[1]);
+              if (jQuery.isNumeric(j))
+                $('#product_' + product_map[id][j]).html(pair[1]);
             }
           }
         }
