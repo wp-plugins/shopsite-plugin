@@ -1,16 +1,19 @@
 <?php
 /**
  * @package ShopSite
- * @version 1.5.0
+ * @version 1.5.1
  */
 /*
 Plugin Name: ShopSite
 Plugin URI: http://shopsite.com/
 Description: ShopSite plugin to put products into your WordPress blog
 Author: ShopSite
-Version: 1.5.0
+Version: 1.5.1
 Author URI: http://shopsite.com/
 */
+
+
+
 if (isset($_REQUEST['ss_action'])) {
   //taken from http://plugins.svn.wordpress.org/limelight-networks/trunk/limelight_popup.php
   if ( !defined('WP_LOAD_PATH') ) {
@@ -38,25 +41,54 @@ if (isset($_REQUEST['ss_action'])) {
 $product_list;
 $wp_id;
 
-register_activation_hook( __FILE__, 'on_activate' );
 
+register_uninstall_hook(__FILE__, 'on_uninstall');
+
+register_activation_hook( __FILE__, 'on_activate' );
 function on_activate() {
-  add_option('Activated_Plugin','Plugin-Slug');
+  add_option('ss_just_activated','yes');
+}
+
+function on_uninstall() {
+  $option_list = array('shopsite_url', 'config_dump', 'config_type', 'clientid', 'secretkey', 'code', 'authorizationurl', 'identifier', 'remember_search', 'remembered_search_string', 'media_url', 'version');
+  foreach ($option_list as $option) {
+    delete_option('ss_'.$option);
+  }
 }
 
 function load_plugin() {
-    if ( is_admin() && get_option( 'Activated_Plugin' ) == 'Plugin-Slug' ) {
-        delete_option( 'Activated_Plugin' );
+    $version = "1.5.1";
+    if ( is_admin() ) {  
+      $running_version = get_option('ss_version');
+      if (!$running_version) 
+        $running_version = "1";
         
-        $shopsite_url = get_option('shopsite_url');
+      update_option('ss_version', $version);
+      if ($running_version < "1.5.1") {
+        
+        //updating, rename to ss_ options to prevent conflicts with other plugins
+        {
+          $option_list = array('shopsite_url', 'config_dump', 'config_type', 'clientid', 'secretkey', 'code', 'authorizationurl', 'identifier', 'remember_search', 'remembered_search_string', 'media_url');
+          foreach ($option_list as $option) {
+            $option_val = get_option($option);
+            if ($option_val) {
+              update_option('ss_'.$option, $option_val);
+              delete_option($option);
+            } else
+              add_option('ss_'+$option);
+          }
+        }
+      }
+      
+      if (get_option('ss_just_activated')) {
+        delete_option( 'ss_just_activated' );
+        $shopsite_url = get_option('ss_shopsite_url');
         if ($shopsite_url == false || strlen($shopsite_url) < 10) {
           add_action( 'admin_head', 'start_tutorial');
         }
-        /*else {
-          $media_url = get_option('media_url');
-          if ($media_url == false || strlen($media_url) < 10)
-            add_action( 'admin_head', 'request_output_url');
-        }*/
+      }
+
+      
     }
 }
 
@@ -106,20 +138,11 @@ function show_shopsite_menu() {
   include_once "oauth.php";
   $testing = false;
   $state = 'new_config';
-  add_option('config_dump');
   
-  add_option('config_type');
-
-	add_option('shopsite_url');
-  add_option('clientid');
-  add_option('secretkey');
-  add_option('code');
-  add_option('authorizationurl');
-  
-  add_option('identifier');
-  
-  add_option('remember_search');
-  add_option('remembered_search_string');
+  /*$option_list = array('shopsite_url', 'config_dump', 'config_type', 'clientid', 'secretkey', 'code', 'authorizationurl', 'identifier', 'remember_search', 'remembered_search_string', 'media_url');
+  foreach ($option_list as $option) {
+    echo "<br>$option  |".get_option($option)."| |".get_option('ss_'.$option)."|";
+  }*/
   
   
   if (isset($_REQUEST['config_type'])) {
@@ -127,30 +150,30 @@ function show_shopsite_menu() {
     $config_type = trim($_REQUEST['config_type']);
     //echo "<script>alert('$config_type');</script>";
 
-    update_option('config_type', $config_type);
+    update_option('ss_config_type', $config_type);
     $state = 'settings_saved';
     
     if ($config_type == 'ss_12') {
-      update_option('config_dump', trim($_REQUEST['config_dump']));
+      update_option('ss_config_dump', trim($_REQUEST['config_dump']));
       
       
       $decoded = base64_decode(trim($_REQUEST['config_dump']));
       $decoded = explode('^',$decoded);
       
-      update_option('clientid', trim($decoded[0]));
-      update_option('secretkey', trim($decoded[1]));
-      update_option('code', trim($decoded[2]));
-      update_option('authorizationurl', trim($decoded[3]));
-      update_option('shopsite_url', trim($decoded[4]));
+      update_option('ss_clientid', trim($decoded[0]));
+      update_option('ss_secretkey', trim($decoded[1]));
+      update_option('ss_code', trim($decoded[2]));
+      update_option('ss_authorizationurl', trim($decoded[3]));
+      update_option('ss_shopsite_url', trim($decoded[4]));
     } else {
       
-      $clientid = trim($_REQUEST['clientid']); update_option('clientid', $clientid);
-      $secretkey = trim($_REQUEST['secretkey']); update_option('secretkey', $secretkey);
-      $code = trim($_REQUEST['code']); update_option('code', $code);
-      $authorizationurl = trim($_REQUEST['authorizationurl']); update_option('authorizationurl', $authorizationurl);
-      $shopsite_url = trim($_REQUEST['shopsite_url']); update_option('shopsite_url', $shopsite_url);
+      $clientid = trim($_REQUEST['clientid']); update_option('ss_clientid', $clientid);
+      $secretkey = trim($_REQUEST['secretkey']); update_option('ss_secretkey', $secretkey);
+      $code = trim($_REQUEST['code']); update_option('ss_code', $code);
+      $authorizationurl = trim($_REQUEST['authorizationurl']); update_option('ss_authorizationurl', $authorizationurl);
+      $shopsite_url = trim($_REQUEST['shopsite_url']); update_option('ss_shopsite_url', $shopsite_url);
       $config_dump = base64_encode("$clientid^$secretkey^$code^$authorizationurl^$shopsite_url");
-      update_option('config_dump', $config_dump);
+      update_option('ss_config_dump', $config_dump);
     }
   }
 	
@@ -160,25 +183,25 @@ function show_shopsite_menu() {
   if (isset($_REQUEST['code'])) update_option('code', trim($_REQUEST['code']));
   if (isset($_REQUEST['authorizationurl'])) update_option('authorizationurl', trim($_REQUEST['authorizationurl']));*/
   
-  if (isset($_REQUEST['identifier'])) update_option('identifier', trim($_REQUEST['identifier']));
+  if (isset($_REQUEST['identifier'])) update_option('ss_identifier', trim($_REQUEST['identifier']));
   if (isset($_REQUEST['test'])) {
     $testing = true;
     $test_result = test_connection();
     $state = 'testing_completed';
   }
   
-  $config_type = get_option('config_type');
+  $config_type = get_option('ss_config_type');
   if (strlen($config_type) == 0)
     $config_type = 'ss_12';
-	$config_dump = get_option('config_dump');
-	$shopsite_url = get_option('shopsite_url');
-  $clientid = get_option('clientid');
-  $secretkey = get_option('secretkey');
-  $code = get_option('code');
-  $authorizationurl = get_option('authorizationurl');
+	$config_dump = get_option('ss_config_dump');
+	$shopsite_url = get_option('ss_shopsite_url');
+  $clientid = get_option('ss_clientid');
+  $secretkey = get_option('ss_secretkey');
+  $code = get_option('ss_code');
+  $authorizationurl = get_option('ss_authorizationurl');
   
   
-  $identifier = get_option('identifier');
+  $identifier = get_option('ss_identifier');
   
   $SKU_selected = $GUID_selected = "";
   if ($identifier == 'SKU')
@@ -287,19 +310,6 @@ function register_shopsite_button($buttons) {
  
 // Load the TinyMCE plugin : editor_plugin.js (wp2.5)
 function add_shopsite_tinymce_plugin($plugin_array) {
-  
-  /*var shopsite_url='".get_option('shopsite_url')."'; 
-  var includes_url='".includes_url()."';
-  var clientid='".get_option('clientid')."'; 
-  var secretkey='".get_option('secretkey')."'; 
-  var code='".get_option('code')."'; 
-  var authorizationurl='".get_option('authorizationurl')."'; */
-  
-  /*  var includes_path='".addslashes(ABSPATH.WPINC)."';
-  var includes_url='".includes_url()."';
-  var wp_path='$path';
-  alert('$path');
-*/
   echo 
   "<script>
   var ss_path='".plugin_dir_url(__FILE__)."'; 
@@ -325,11 +335,11 @@ function show_search_form() {
   $remember_search = "";
   $selected_name = "";
   $selected_sku = "";
-  if (get_option('remember_search') == 'true') {
+  if (get_option('ss_remember_search') == 'true') {
       $remember_search = "checked";
       
-    if (strlen(get_option('remembered_search_string')))
-      $search_string = get_option('remembered_search_string');
+    if (strlen(get_option('ss_remembered_search_string')))
+      $search_string = get_option('ss_remembered_search_string');
     
   }
   
@@ -340,11 +350,13 @@ function show_search_form() {
   link_tutorial();
   echo"<script type='text/javascript' src='".$tinymce_url."'></script>\n
   <script type='text/javascript' src='".plugin_dir_url(__FILE__)."search_products.js?".time()."'></script>
-  <script type='text/javascript'> var remembered_search_string = '".$search_string."';</script>
+  <script type='text/javascript'> var ss_remembered_search_string = '".$search_string."';</script>
   
   
   </head>
   <body>";
+  
+  
   
   echo "<div id=top_bar>";
   echo "<div id=message>You can use CTRL and SHIFT keys to select multiple products.</div>";  
@@ -353,7 +365,16 @@ function show_search_form() {
   echo "</div>";
   echo "</div>";
   echo "<div id=search_results></div>";
-  echo "<div id=\"bottom_fix\"><div id=\"insert_button\">Insert into post</div></div>";
+  
+  $extra_space = "";
+  $message = "";
+  if (!get_option('ss_media_url')) 
+  {
+    $extra_space = " style='height:80px;'";
+    $message = "<div id=extra_message>Upgrade your store to ShopSite v12 sp1 or greater to see product images above.</div>";
+  }
+  
+  echo "<div id=\"bottom_fix\"$extra_space>$message<div id=\"insert_button\">Insert selected products into post</div></div>";
   
   echo "
   </body>
@@ -372,25 +393,24 @@ function get_product_list() {
   $remember_search = $_REQUEST['remember_search'];
   
   ///debug_print("Updating remember_search to $remember_search");
-  update_option('remember_search', $remember_search);
+  update_option('ss_remember_search', $remember_search);
   
   if ($remember_search == 'true') {
-    update_option('remembered_search_string', $search_string);
+    update_option('ss_remembered_search_string', $search_string);
   }
 
   
-  $shopsite_url = get_option('shopsite_url');
+  $shopsite_url = get_option('ss_shopsite_url');
 
   
   $media_url = false;//get_option('media_url');
   if (!$media_url) {
-    $shopsite_url = get_option('shopsite_url');
+    $shopsite_url = get_option('ss_shopsite_url');
     $url = $shopsite_url."&operation=get_setting&setting=output_url";  
     $outputurl = curl_open($url);
     if (strlen($outputurl) > 10) {
       $media_url = $outputurl."/media/";
-      add_option('media_url');
-      update_option('media_url', $media_url);
+      update_option('ss_media_url', $media_url);
     }
   }
   
@@ -411,7 +431,7 @@ function get_product_list() {
   }
     
   $products_xml = oauth(
-    get_option('clientid'), get_option('secretkey'), get_option('code'), get_option('authorizationurl'), 
+    get_option('ss_clientid'), get_option('ss_secretkey'), get_option('ss_code'), get_option('ss_authorizationurl'), 
     DOWNLOAD, 
     array_merge(array('clientApp'=>'1', 'dbname'=>'products', 'version'=>'11.2', 'fields'=>'|Product GUID|Name|SKU|Graphic|', 'limit'=>$limit), $search_array)
   );
@@ -436,7 +456,7 @@ function get_product_list() {
   if (!$list_all && !$media_url) {
     $search_array = array('search_on'=>"sku", 'search_term'=>$search_string, 'search_filter'=>'contains');
     $products_xml = oauth(
-      get_option('clientid'), get_option('secretkey'), get_option('code'), get_option('authorizationurl'), 
+      get_option('ss_clientid'), get_option('ss_secretkey'), get_option('ss_code'), get_option('ss_authorizationurl'), 
       DOWNLOAD, 
       array_merge(array('clientApp'=>'1', 'dbname'=>'products', 'version'=>'11.2', 'fields'=>'|Product GUID|Name|SKU|Graphic|', 'limit'=>$limit), $search_array)
     );
@@ -472,6 +492,7 @@ function get_product_list() {
 }
 
 function print_product ($count, $name, $data, $media_url) {
+  
   $id = $data[0];
   $sku = rawurlencode($data[1]);
   $image = $data[2];
@@ -487,14 +508,16 @@ function print_product ($count, $name, $data, $media_url) {
       $image = "ss_size2/no-image.png";
   }
   
-  echo "<div class=\"wp_product\" id=\"wp_product_$count\">";
+  $outdated = "";
+  if (!$media_url)
+    $outdated = " outdated";
+  
+  echo "<div class=\"wp_product$outdated\" id=\"wp_product_$count\">";
   if ($media_url)
     if (strstr($image, "://"))
       echo "<img class=\"product_image\" src=\"".$image."\">";
     else
       echo "<img class=\"product_image\" src=\"".$media_url.$image."\">";
-  else 
-    echo "<div class=\"outdated_shopsite\">Update ShopSite to see product images</div>";
   if (strlen($sku) > 0)
     echo "<div class='product_sku'>".strip_tags($sku)."</div>";
   echo "<a class=\"product_name\" title=\"".str_replace("\"","&quot;",$name)."\">".strip_tags($name)."</a>";
@@ -516,7 +539,7 @@ function product_handler( $atts, $content=null, $code="" ) {
     'sku'=>''
 	), $atts ) );
   
-  if (get_option('identifier') == 'SKU')
+  if (get_option('ss_identifier') == 'SKU')
     $identifier = $sku;
   else
     $identifier = $id;
@@ -567,7 +590,7 @@ function dispatch_product_list() {
   ///debug_print("product_list:".print_r($product_list, true));
   $product_map = json_encode($product_list);
   ///debug_print("product_map:".print_r($product_map, true));
-  $identifier = get_option('identifier');
+  $identifier = get_option('ss_identifier');
   $id_list = implode(",",array_unique(array_keys($product_list))); 
   
   //debug_print("dispatched:|$id_list|");
@@ -575,10 +598,10 @@ function dispatch_product_list() {
   
   echo 
     "<script> var ss_path='".plugin_dir_url(__FILE__)."'; 
-    var identifier = \"$identifier\"; 
-    var product_map = $product_map; 
-    var id_list = \"$id_list\"; 
-    var shopsite_url=\"".get_option('shopsite_url')."\";</script>";
+    var ss_identifier = \"$identifier\"; 
+    var ss_product_map = $product_map; 
+    var ss_id_list = \"$id_list\"; 
+    var ss_shopsite_url=\"".get_option('ss_shopsite_url')."\";</script>";
   //echo "<script> var product_mapping = ".json_encode($product_list).";</script>";
 }
 
@@ -586,8 +609,8 @@ function dispatch_product_list() {
 function get_product_data($id_list) {
   $id_list = stripslashes($id_list);
   //debug_print("GPD |$id_list|");
-  $clientid = get_option('clientid');
-  $secretkey = get_option('secretkey');
+  $clientid = get_option('ss_clientid');
+  $secretkey = get_option('ss_secretkey');
   $ids = explode(",", $id_list);
   $decoded_id_list = array();
   foreach ($ids as $id) {
@@ -597,10 +620,10 @@ function get_product_data($id_list) {
   $hmachash = hash_hmac("sha1", $data, $secretkey, true);
   $signature = rawurlencode(base64_encode($hmachash));
   
-  $identifier = get_option('identifier');
+  $identifier = get_option('ss_identifier');
   
   //$shopsite_url = $_REQUEST['shopsite_url'];   
-  $shopsite_url = get_option('shopsite_url');
+  $shopsite_url = get_option('ss_shopsite_url');
   //$id_list = "\"".str_replace(",","\",\"",$id_list)."\"";
   $url = $shopsite_url."&operation=get_products&".$identifier."_list=".$id_list."&signature=".$signature;
   //debug_print("DATA URL |$url|");
@@ -619,7 +642,7 @@ function test_connection() {
   }
 
   $test_download_xml = oauth(
-    get_option('clientid'), get_option('secretkey'), get_option('code'), get_option('authorizationurl'), 
+    get_option('ss_clientid'), get_option('ss_secretkey'), get_option('ss_code'), get_option('ss_authorizationurl'), 
     DOWNLOAD, 
     array('clientApp'=>'1', 'dbname'=>'products', 'version'=>'11.2', 'fields'=>'|Product GUID|Name|SKU|', 'search_term'=>"B0gu5", 'search_on'=>'name', 'search_filter'=>'contains', 'limit'=>1)
   );
@@ -638,7 +661,7 @@ function test_connection() {
   if ($handle == false)
     return array("success"=>false, "error"=>"Check your callback URL");*/
   
-  if (curl_open(get_option('shopsite_url')) == false)
+  if (curl_open(get_option('ss_shopsite_url')) == false)
     return array("success"=>false, "error"=>"Check your callback URL");
   
   return array("success"=>true); 

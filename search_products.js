@@ -120,10 +120,10 @@ function do_stuff() {
   
   
   var last_search_string = "";
-  if (remembered_search_string == "*")
+  if (ss_remembered_search_string == "*")
     search_products('*', 'true');
   else {
-    last_search_string = remembered_search_string;
+    last_search_string = ss_remembered_search_string;
     $('#search').trigger('click');
     $('#search_button').trigger('click');
   }

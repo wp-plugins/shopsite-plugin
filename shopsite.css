@@ -140,6 +140,11 @@ div.wp_product {
   user-select: none;
 }
 
+div.outdated {
+  height: 80px;
+  padding-top: 20px;
+}
+
 div.wp_product img {
   max-width:130px;
   max-height: 100px;
@@ -194,11 +199,19 @@ div#bottom_fix {
   box-shadow: 0 0px 5px #CDCDCD; -moz-box-shadow: 0 0px 5px #CDCDCD; -webkit-box-shadow: 0 0px 5px #CDCDCD;
 }
 
+div#extra_message {
+  margin-top: 5px;
+  margin-bottom: -10px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
 div#insert_button {
   background-color: #2ea2cc;
   border: 1px solid #0074a2;
   color: white;
-  width: 150px;
+  width: 300px;
   border-radius: 3px;
   font-size: 13px;
   margin-left: auto;

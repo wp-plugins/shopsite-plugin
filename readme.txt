@@ -2,7 +2,7 @@
 Contributors: ShopSite
 Tags: e-commerce, shopping, shopsite
 Requires at least: 3.2.0
-Tested up to: 4.1
+Tested up to: 4.1.1
 Stable tag: trunk
 
 Add a free ShopSite shopping cart to your WordPress site and start taking orders today!
@@ -25,6 +25,9 @@ The plugin requires ShopSite v11 SP2 or greater.
 
 
 == Changelog ==
+= 1.5.1 =
+* Renamed options and variables to minimize potential conflict with other plugins. Minor UI changes. Delete data when deleting plugin.
+
 = 1.5.0 =
 * Changed UI for selecting a product.
 

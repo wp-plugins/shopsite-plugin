@@ -11,7 +11,7 @@ function populate_products() {
   $.ajax({
     async: true,
     type: 'POST',
-    data: {ss_action:'get_data', shopsite_url:shopsite_url, id_list: id_list, identifier: identifier},
+    data: {ss_action:'get_data', shopsite_url:ss_shopsite_url, id_list: ss_id_list, identifier: ss_identifier},
     url: ss_path + "shopsite.php",
     success: function(data) {
       //alert(data);
@@ -22,9 +22,9 @@ function populate_products() {
             var pair = products[i].split("\6");
             var id = rfc3986EncodeURIComponent(pair[0]);
             //alert(id);
-            for (j in product_map[id]) {
+            for (j in ss_product_map[id]) {
               if (jQuery.isNumeric(j))
-                $('#product_' + product_map[id][j]).html(pair[1]);
+                $('#product_' + ss_product_map[id][j]).html(pair[1]);
             }
           }
         }
