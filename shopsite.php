@@ -1,14 +1,14 @@
 <?php
 /**
  * @package ShopSite
- * @version 1.5.1
+ * @version 1.5.2
  */
 /*
 Plugin Name: ShopSite
 Plugin URI: http://shopsite.com/
 Description: ShopSite plugin to put products into your WordPress blog
 Author: ShopSite
-Version: 1.5.1
+Version: 1.5.2
 Author URI: http://shopsite.com/
 */
 
@@ -57,7 +57,7 @@ function on_uninstall() {
 }
 
 function load_plugin() {
-    $version = "1.5.1";
+    $version = "1.5.2";
     if ( is_admin() ) {  
       $running_version = get_option('ss_version');
       if (!$running_version) 
@@ -407,8 +407,8 @@ function get_product_list() {
   if (!$media_url) {
     $shopsite_url = get_option('ss_shopsite_url');
     $url = $shopsite_url."&operation=get_setting&setting=output_url";  
-    $outputurl = curl_open($url);
-    if (strlen($outputurl) > 10) {
+    $outputurl = curl_open($url)[0];
+    if ($outputurl && strlen($outputurl) > 10) {
       $media_url = $outputurl."/media/";
       update_option('ss_media_url', $media_url);
     }
@@ -632,7 +632,11 @@ function get_product_data($id_list) {
   $handle = fopen($url,'r');
   ini_set('allow_url_fopen', $url_openable);
 	print(stream_get_contents($handle));*/
-  print(curl_open($url));
+  $product_data = curl_open($url)[0];
+  if ($product_data)
+    print($product_data);
+  else
+    print($product_data[1]);
 }
 
 function test_connection() {
@@ -650,19 +654,9 @@ function test_connection() {
     return $test_download_xml;
     
   
-    
-  /*$shopsite_url = get_option('shopsite_url');
-  $url_openable = ini_get('allow_url_fopen');
-  ini_set('allow_url_fopen', true);
-  $url = $shopsite_url;
-  $handle = fopen($url,'r');
-  ini_set('allow_url_fopen', $url_openable);
-  
-  if ($handle == false)
-    return array("success"=>false, "error"=>"Check your callback URL");*/
-  
-  if (curl_open(get_option('ss_shopsite_url')) == false)
-    return array("success"=>false, "error"=>"Check your callback URL");
+  $res = curl_open(get_option('ss_shopsite_url'));
+  if ($res[0] == false)
+    return array("success"=>false, "error"=>$res[1]);
   
   return array("success"=>true); 
 }
@@ -676,10 +670,17 @@ function curl_open($url) {
   curl_setopt($ch, CURLOPT_URL, $url);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
   $html = curl_exec($ch);
+  if (curl_errno($ch))
+    $retval = array(false, curl_error($ch));
+  else
+    $retval = array($html);
+
   curl_close($ch);
       
-  return $html;
+  return $retval;
 }
 
 ?>

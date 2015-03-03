@@ -25,6 +25,9 @@ The plugin requires ShopSite v11 SP2 or greater.
 
 
 == Changelog ==
+= 1.5.2 =
+* Don't require SSL verification of secure URLs.
+
 = 1.5.1 =
 * Renamed options and variables to minimize potential conflict with other plugins. Minor UI changes. Delete data when deleting plugin.
 
