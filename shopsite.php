@@ -1,14 +1,14 @@
 <?php
 /**
  * @package ShopSite
- * @version 1.5.2
+ * @version 1.5.3
  */
 /*
 Plugin Name: ShopSite
 Plugin URI: http://shopsite.com/
 Description: ShopSite plugin to put products into your WordPress blog
 Author: ShopSite
-Version: 1.5.2
+Version: 1.5.3
 Author URI: http://shopsite.com/
 */
 
@@ -57,7 +57,7 @@ function on_uninstall() {
 }
 
 function load_plugin() {
-    $version = "1.5.2";
+    $version = "1.5.3";
     if ( is_admin() ) {  
       $running_version = get_option('ss_version');
       if (!$running_version) 
@@ -407,7 +407,8 @@ function get_product_list() {
   if (!$media_url) {
     $shopsite_url = get_option('ss_shopsite_url');
     $url = $shopsite_url."&operation=get_setting&setting=output_url";  
-    $outputurl = curl_open($url)[0];
+    $curl_res = curl_open($url);
+    $outputurl = $curl_res[0];
     if ($outputurl && strlen($outputurl) > 10) {
       $media_url = $outputurl."/media/";
       update_option('ss_media_url', $media_url);
@@ -632,7 +633,8 @@ function get_product_data($id_list) {
   $handle = fopen($url,'r');
   ini_set('allow_url_fopen', $url_openable);
 	print(stream_get_contents($handle));*/
-  $product_data = curl_open($url)[0];
+  $curl_res = curl_open($url);
+  $product_data = $curl_res[0];
   if ($product_data)
     print($product_data);
   else

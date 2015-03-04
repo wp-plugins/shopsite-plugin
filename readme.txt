@@ -25,6 +25,9 @@ The plugin requires ShopSite v11 SP2 or greater.
 
 
 == Changelog ==
+= 1.5.3 =
+* Fix for PHP versions less than 5.4.
+
 = 1.5.2 =
 * Don't require SSL verification of secure URLs.
 
