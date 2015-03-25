@@ -1,14 +1,14 @@
 <?php
 /**
  * @package ShopSite
- * @version 1.5.3
+ * @version 1.5.4
  */
 /*
 Plugin Name: ShopSite
 Plugin URI: http://shopsite.com/
 Description: ShopSite plugin to put products into your WordPress blog
 Author: ShopSite
-Version: 1.5.3
+Version: 1.5.4
 Author URI: http://shopsite.com/
 */
 
@@ -57,7 +57,7 @@ function on_uninstall() {
 }
 
 function load_plugin() {
-    $version = "1.5.3";
+    $version = "1.5.4";
     if ( is_admin() ) {  
       $running_version = get_option('ss_version');
       if (!$running_version) 
@@ -117,9 +117,14 @@ function link_tutorial() {
   
 }
 
+function link_ss_path() {
+  echo "<script>var ss_path='".plugin_dir_url(__FILE__)."';</script>";
+}
+
 
 //add_action( 'admin_enqueue_scripts', 'link_jquery' );
 add_action( 'admin_head', 'link_tutorial' );
+add_action( 'admin_head', 'link_ss_path' );
 add_action( 'admin_init', 'load_plugin' );
 add_action( 'wp_enqueue_scripts', 'add_scripts' );
 add_action( 'wp_head', 'init_product_list' );
@@ -152,6 +157,8 @@ function show_shopsite_menu() {
 
     update_option('ss_config_type', $config_type);
     $state = 'settings_saved';
+    
+    delete_option('ss_media_url');
     
     if ($config_type == 'ss_12') {
       update_option('ss_config_dump', trim($_REQUEST['config_dump']));
@@ -309,12 +316,9 @@ function register_shopsite_button($buttons) {
 }
  
 // Load the TinyMCE plugin : editor_plugin.js (wp2.5)
-function add_shopsite_tinymce_plugin($plugin_array) {
-  echo 
-  "<script>
-  var ss_path='".plugin_dir_url(__FILE__)."'; 
-  </script>";
-  
+
+
+function add_shopsite_tinymce_plugin($plugin_array) { 
   $path = plugin_dir_url(__FILE__).'editor_plugin.js';
   $plugin_array['shopsite'] = $path;
   return $plugin_array;
@@ -368,7 +372,8 @@ function show_search_form() {
   
   $extra_space = "";
   $message = "";
-  if (!get_option('ss_media_url')) 
+  $media_url = get_media_url();
+  if (!$media_url) 
   {
     $extra_space = " style='height:80px;'";
     $message = "<div id=extra_message>Upgrade your store to ShopSite v12 sp1 or greater to see product images above.</div>";
@@ -381,6 +386,20 @@ function show_search_form() {
   </html>";
 }
 
+function get_media_url() {
+  $media_url = get_option('ss_media_url');
+  if (!$media_url) {
+    $shopsite_url = get_option('ss_shopsite_url');
+    $url = $shopsite_url."&operation=get_setting&setting=output_url";  
+    $curl_res = curl_open($url);
+    $outputurl = $curl_res[0];
+    if ($outputurl && strlen($outputurl) > 10) {
+      $media_url = $outputurl."/media/";
+      update_option('ss_media_url', $media_url);
+    }
+  }
+  return $media_url;
+}
 
 
 function get_product_list() {
@@ -403,17 +422,7 @@ function get_product_list() {
   $shopsite_url = get_option('ss_shopsite_url');
 
   
-  $media_url = false;//get_option('media_url');
-  if (!$media_url) {
-    $shopsite_url = get_option('ss_shopsite_url');
-    $url = $shopsite_url."&operation=get_setting&setting=output_url";  
-    $curl_res = curl_open($url);
-    $outputurl = $curl_res[0];
-    if ($outputurl && strlen($outputurl) > 10) {
-      $media_url = $outputurl."/media/";
-      update_option('ss_media_url', $media_url);
-    }
-  }
+  $media_url = get_media_url();
   
   
   

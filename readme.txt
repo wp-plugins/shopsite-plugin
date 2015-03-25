@@ -25,6 +25,9 @@ The plugin requires ShopSite v11 SP2 or greater.
 
 
 == Changelog ==
+= 1.5.4 =
+* Improve compatibility with other TinyMCE plugins; improve image display
+
 = 1.5.3 =
 * Fix for PHP versions less than 5.4.
 
