@@ -4,6 +4,10 @@ function rfc3986EncodeURIComponent (str) {
     return encodeURIComponent(str).replace(/[!'()*]/g, escape);  
 }
 
+function isNumber(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 function populate_products() {
   //alert(id_list);
   //alert(path + "shopsite.php");
@@ -23,7 +27,7 @@ function populate_products() {
             var id = rfc3986EncodeURIComponent(pair[0]);
             //alert(id);
             for (j in ss_product_map[id]) {
-              if (jQuery.isNumeric(j))
+              if (isNumber(j))
                 $('#product_' + ss_product_map[id][j]).html(pair[1]);
             }
           }

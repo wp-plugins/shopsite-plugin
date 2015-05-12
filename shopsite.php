@@ -1,14 +1,14 @@
 <?php
 /**
  * @package ShopSite
- * @version 1.5.4
+ * @version 1.5.5
  */
 /*
 Plugin Name: ShopSite
 Plugin URI: http://shopsite.com/
 Description: ShopSite plugin to put products into your WordPress blog
 Author: ShopSite
-Version: 1.5.4
+Version: 1.5.5
 Author URI: http://shopsite.com/
 */
 
@@ -57,7 +57,7 @@ function on_uninstall() {
 }
 
 function load_plugin() {
-    $version = "1.5.4";
+    $version = "1.5.5";
     if ( is_admin() ) {  
       $running_version = get_option('ss_version');
       if (!$running_version) 

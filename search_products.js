@@ -49,8 +49,6 @@ function do_stuff() {
         ctrl = false;
     if(event.which=="16")
         shift = false;
-        
-    
   });
 
   
